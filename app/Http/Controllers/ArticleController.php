@@ -151,9 +151,29 @@ class ArticleController extends Controller
         return response()->json($articles);
     }
 
-    public function showArticles()
+    public function showArticles(Request $request)
     {
-        $articles = Article::orderBy('published_at', 'desc')->get();
+   
+        $query = Article::query();
+
+        if ($request->filled('category')) {
+            $query->where('category', 'like', '%' . $request->category . '%');
+        }
+
+        if ($request->filled('source')) {
+            $query->where('source', 'like', '%' . $request->source . '%');
+        }
+
+        if ($request->filled('published_at')) {
+            $query->whereDate('published_at', $request->published_at);
+        }
+
+        if ($request->filled('author')) {
+            $query->where('author', 'LIKE', '%' . $request->input('author') . '%');
+        }
+
+        $articles = $query->orderBy('published_at', 'desc')->get();
+
         return view('articles.index', compact('articles'));
     }
 
