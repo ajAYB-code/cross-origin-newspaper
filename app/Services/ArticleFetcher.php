@@ -34,4 +34,18 @@ class ArticleFetcher
 
         return json_decode($response->getBody()->getContents(), true);
     }
+
+    public function fetchLeParisienArticles()
+    {
+        $response = $this->client->get('/leparisien', [
+            'query' => [
+                'token' => env('LEPARISIEN_API_TOKEN'),
+            ],
+            'headers' => [
+                'Accept' => 'application/json',
+            ],
+        ]);
+
+        return json_decode($response->getBody()->getContents(), true);
+    }
 }

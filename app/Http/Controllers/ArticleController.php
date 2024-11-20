@@ -21,7 +21,6 @@ class ArticleController extends Controller
     public function getLeMondeArticles()
     {
         $articles = $this->fetcher->fetchLeMondeArticles()['data'];
-        $today_artciles = collect([]);
         $today = Carbon::today()->toDateString();
         foreach ($articles as $articleData) {
 
@@ -53,11 +52,10 @@ class ArticleController extends Controller
                         'source' => 'Le Monde',
                     ]
                 );
-                $today_artciles->add($articleData);
                 
             }
         }
-        dd($today_artciles);
+
         return response()->json(['message' => 'Articles Le Monde récupérés et stockés !']);
     }
 
@@ -103,6 +101,50 @@ class ArticleController extends Controller
         return response()->json(['message' => 'Articles Lequipe récupérés et stockés !']);
     }
 
+    public function getLeParisienArticles()
+    {
+        $articles = $this->fetcher->fetchLeParisienArticles()['data'];
+
+        $today = Carbon::today()->toDateString();
+        foreach ($articles as $articleData) {
+            
+            //Validate data
+            $validator = Validator::make($articleData, [
+                'headlines.basic' => 'required|string|max:255', // Titre de l'article
+                'credits' => 'nullable|array',                 // Crédits (auteur)
+                'credits.*.name' => 'nullable|string|max:255', // Nom de l'auteur
+                'content' => 'required|string',                // Contenu de l'article
+                'publish_date' => 'required|integer',          // Date de publication sous forme de timestamp
+                'keywords' => 'nullable|array',                // Mots-clés (catégories)
+                'keywords.*' => 'string|max:100',              // Chaque mot-clé
+            ]);
+    
+            if ($validator->fails()) {
+                // Log and skip invalid data
+                Log::warning('Invalid article data', $articleData);
+                continue;
+            }
+
+            $publishedAt = Carbon::createFromTimestamp($articleData['publish_date'])->toDateString();
+            if ($publishedAt === $today) {
+                $authorName = isset($articleData['credits'][0]['name']) ? $articleData['credits'][0]['name'] : 'Unknown';
+    
+                Article::updateOrCreate(
+                    ['title' => $articleData['headlines']['basic']], // Utiliser le titre comme clé unique
+                    [
+                        'author' => $authorName,
+                        'content' => $articleData['content'],
+                        'published_at' => Carbon::createFromTimestamp($articleData['publish_date'])->format('Y-m-d H:i:s'),
+                        'category' => implode(', ', $articleData['keywords']), // Concaténer les mots-clés en une chaîne
+                        'source' => 'Le Parisien',
+                    ]
+                );
+            }
+        }
+
+        return response()->json(['message' => 'Articles Le Parisien récupérés et stockés !']);
+    }
+
     public function index()
     {
         $articles = Article::all();
@@ -111,7 +153,7 @@ class ArticleController extends Controller
 
     public function showArticles()
     {
-        $articles = Article::all();
+        $articles = Article::orderBy('published_at', 'desc')->get();
         return view('articles.index', compact('articles'));
     }
 
