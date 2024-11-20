@@ -172,6 +172,17 @@ class ArticleController extends Controller
             $query->where('author', 'LIKE', '%' . $request->input('author') . '%');
         }
 
+        if ($request->filled('search')) { // Check if 'search' is not empty
+            $searchTerms = explode(' ', $request->search); // Split search terms by spaces
+            $query->where(function ($subQuery) use ($searchTerms) {
+                foreach ($searchTerms as $term) {
+                    $subQuery->orWhere('title', 'like', '%' . $term . '%')
+                             ->orWhere('content', 'like', '%' . $term . '%')
+                             ->orWhere('author', 'like', '%' . $term . '%');
+                }
+            });
+        }
+
         $articles = $query->orderBy('published_at', 'desc')->get();
 
         return view('articles.index', compact('articles'));

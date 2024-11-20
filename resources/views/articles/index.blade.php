@@ -10,25 +10,20 @@
     <div class="container mt-4">
         <h1 class="mb-4">Liste des Articles</h1>
 
-        <!-- Formulaire de filtre -->
         <form method="GET" action="{{ route('articles') }}" class="mb-4">
             <div class="row">
-                <!-- Champ de filtre par catégorie -->
                 <div class="col-md-3 mb-3">
                     <input type="text" name="category" class="form-control" placeholder="Catégorie" value="{{ request('category') }}">
                 </div>
-                
-                <!-- Champ de filtre par source (journal) -->
                 <div class="col-md-3 mb-3">
                     <input type="text" name="source" class="form-control" placeholder="Journal" value="{{ request('source') }}">
                 </div>
-                
-                <!-- Champ de filtre par date -->
                 <div class="col-md-3 mb-3">
                     <input type="date" name="published_at" class="form-control" value="{{ request('published_at') }}">
                 </div>
-                
-                <!-- Bouton de soumission -->
+                <div class="form-group col-md-3">
+                    <input type="text" class="form-control" name="search" placeholder="Recherche par mots-clés" value="{{ request('search') }}">
+                </div>
                 <div class="col-md-3 mb-3">
                     <button type="submit" class="btn btn-primary w-100">Filtrer</button>
                 </div>
