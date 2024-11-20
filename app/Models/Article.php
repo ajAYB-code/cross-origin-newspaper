@@ -15,4 +15,10 @@ class Article extends Model
         'published_at',
         'source',
     ];
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
+
 }

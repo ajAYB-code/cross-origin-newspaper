@@ -1,12 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Liste des Articles</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-</head>
-<body>
+@extends('layout')
+@section('content')
     <div class="container mt-4">
         <h1 class="mb-4">Liste des Articles</h1>
 
@@ -31,41 +24,28 @@
         </form>
 
         <!-- Liste des articles -->
-        @if($articles->isEmpty())
-            <div class="alert alert-warning">Aucun article trouvé.</div>
-        @else
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Titre</th>
-                        <th>Auteur</th>
-                        <th>Catégorie</th>
-                        <th>Journal</th>
-                        <th>Date de Publication</th>
-                        <th>Contenu</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($articles as $article)
-                        <tr>
-                            <td>{{ $loop->iteration }}</td>
-                            <td>{{ $article->title }}</td>
-                            <td>{{ $article->author }}</td>
-                            <td>{{ $article->category }}</td>
-                            <td>{{ $article->source }}</td>
-                            <td>{{ $article->published_at }}</td>
-                            <td>{{ Str::limit($article->content, 50) }}</td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        @endif
-
+        <div class="row">
+        @forelse($articles as $article)
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ $article->title }}</h5>
+                        <p class="card-text">
+                            <strong>Publié le:</strong> {{ \Carbon\Carbon::parse($article->published_at)->format('d/m/Y') }}
+                        </p>
+                        <p class="card-text"><strong>Source:</strong> {{ $article->source }}</p>
+                        <p class="card-text"><strong>Category:</strong> {{ $article->category }}</p>
+                        <p class="card-text text-truncate" style="max-height: 4.5em; overflow: hidden;">
+                        {{ $article->content }}
+                        </p>
+                        <a href="{{ route('articles.show', $article->id) }}" class="btn btn-primary">Voir Détails</a>
+                    </div>
+                </div>
+            </div>
+        @empty
+            <p class="text-center">Aucun article trouvé.</p>
+        @endforelse
+        </div>
 
     </div>
-
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+@endsection

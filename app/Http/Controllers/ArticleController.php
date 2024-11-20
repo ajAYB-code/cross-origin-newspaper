@@ -188,5 +188,11 @@ class ArticleController extends Controller
         return view('articles.index', compact('articles'));
     }
 
+    public function showArticle($id)
+    {
+        $article = Article::with('comments')->findOrFail($id);
+        return view('articles.show', compact('article'));
+    }
+
 }
 
