@@ -38,11 +38,23 @@ class ArticleFetcher
     public function fetchLeParisienArticles()
     {
         $response = $this->client->get('/leparisien', [
+            'headers' => [
+                'Authorization' => 'ApiToken ' . env('PARISIEN_API_TOKEN'),
+            ],
+        ]);
+
+        return json_decode($response->getBody()->getContents(), true);
+    }
+
+    public function fetchLiberationArticles($page = 1, $sort = 'asc')
+    {
+        $response = $this->client->get('/liberation', [
             'query' => [
-                'token' => env('LEPARISIEN_API_TOKEN'),
+                'page' => $page,
+                'acs' => $sort, 
             ],
             'headers' => [
-                'Accept' => 'application/json',
+                'Authorization' => 'Bearer ' . env('LIBERATION_API_TOKEN'),
             ],
         ]);
 

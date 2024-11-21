@@ -1,42 +1,55 @@
 @extends('layout')
 
 @section('content')
-<div class="container">
-    <h1>{{ $article->title }}</h1>
-    <p><strong>Author:</strong> {{ $article->author }}</p>
-    <p><strong>Published At:</strong> {{ $article->published_at }}</p>
-    <p><strong>Source:</strong> {{ $article->source }}</p>
-    <p><strong>Category:</strong> {{ $article->category }}</p>
-    <p>{{ $article->content }}</p>
+<div class="container my-5">
+    <div class="card shadow">
+        <div class="card-body">
+            <h1 class="card-title text-primary">{{ $article->title }}</h1>
+            <hr>
+            <p><strong>Author:</strong> {{ $article->author }}</p>
+            <p><strong>Published At:</strong> {{ \Carbon\Carbon::parse($article->published_at)->format('d/m/Y H:i:s') }}</p>
+            <p><strong>Source:</strong> {{ $article->source }}</p>
+            <p><strong>Category:</strong> {{ $article->category }}</p>
+            <p class="mt-4">{{ $article->content }}</p>
+        </div>
+    </div>
 
-    <hr>
+    <div class="my-5">
+        <h2>Commentaires</h2>
+        @if($article->comments->isEmpty())
+            <div class="alert alert-warning">Aucun commentaire pour cet article.</div>
+        @else
+            <ul class="list-group">
+                @foreach($article->comments as $comment)
+                    <li class="list-group-item">
+                        <div class="d-flex justify-content-between">
+                            <span><strong>{{ $comment->user->name }}</strong></span>
+                            <span class="text-muted">{{ \Carbon\Carbon::parse($comment->created_at)->format('d M Y H:i') }}</span>
+                        </div>
+                        <p class="mb-0 mt-2">{{ $comment->content }}</p>
+                    </li>
+                @endforeach
+            </ul>
+        @endif
+    </div>
 
-    <h3>Commentaires</h3>
-    @if ($article->comments->isEmpty())
-        <p>Aucun commentaire pour cet article.</p>
-    @else
-        @foreach ($article->comments as $comment)
-            <div class="comment mb-3">
-                <p><strong>{{ htmlspecialchars($comment->author) }}</strong> - {{ $comment->created_at->format('d M Y H:i') }}</p>
-                <p>{{ htmlspecialchars($comment->content) }}</p>
+    @auth
+    <div class="my-5">
+        <h2>Ajouter un Commentaire</h2>
+        <form method="POST" action="{{ route('comments.store', $article->id) }}">
+            @csrf
+            <div class="mb-3">
+                <label for="content" class="form-label">Commentaire</label>
+                <textarea id="content" name="content" rows="4" class="form-control @error('content') is-invalid @enderror" required>{{ old('content') }}</textarea>
+                @error('content')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
             </div>
-        @endforeach
-    @endif
-
-    <hr>
-
-    <h4>Ajouter un Commentaire</h4>
-    <form action="{{ route('comments.store', $article->id) }}" method="POST">
-        @csrf
-        <div class="form-group">
-            <label for="author">Nom</label>
-            <input type="text" class="form-control" name="author" id="author" required>
-        </div>
-        <div class="form-group">
-            <label for="content">Commentaire</label>
-            <textarea name="content" id="content" class="form-control" rows="4" required></textarea>
-        </div>
-        <button type="submit" class="btn btn-success mt-2">Ajouter</button>
-    </form>
+            <button type="submit" class="btn btn-success">Ajouter</button>
+        </form>
+    </div>
+    @else
+    <div class="alert alert-info">Veuillez vous connecter pour ajouter un commentaire.</div>
+    @endauth
 </div>
 @endsection
