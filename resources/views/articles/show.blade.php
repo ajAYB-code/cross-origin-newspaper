@@ -33,7 +33,7 @@
         @endif
     </div>
 
-    @auth
+    @if(Auth::user()->role === 'reader' || Auth::user()->role === 'admin')
     <div class="my-5">
         <h2>Ajouter un Commentaire</h2>
         <form method="POST" action="{{ route('comments.store', $article->id) }}">
@@ -48,8 +48,6 @@
             <button type="submit" class="btn btn-success">Ajouter</button>
         </form>
     </div>
-    @else
-    <div class="alert alert-info">Veuillez vous connecter pour ajouter un commentaire.</div>
     @endauth
 </div>
 @endsection
