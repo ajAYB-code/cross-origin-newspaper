@@ -10,4 +10,4 @@ Artisan::command('inspire', function () {
 
 Schedule::call(function (Schedule $schedule) {
     $schedule->command('app:fetch-articles');
-})->hourly();
+})->everyFiveMinutes();

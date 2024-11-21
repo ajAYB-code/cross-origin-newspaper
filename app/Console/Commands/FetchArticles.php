@@ -30,7 +30,8 @@ class FetchArticles extends Command
         
         $controller->getLeMondeArticles();
         $controller->getLequipeArticles();
-        // $controller->getLeParisienArticles();
+        $controller->getLeParisienArticles();
+        $controller->getLiberationArticles();
 
         $this->info('Articles fetched successfully!');
     }
